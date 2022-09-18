@@ -410,3 +410,16 @@ GLFW_IM_MODULE=ibus
 
 # 05. 其他软件
 
+## 05.1 开发
+
+- VSCode
+
+    这两通过 `code` 启动：
+
+    - 微软官方：`yay -S visual-studio-code-bin` 
+    - 通过官方源码编译的开源版本：`pacman -S code` 
+
+    > KDE 下全局菜单失效：
+    >
+    > 安装：`pacman -S libdbusmenu-glib` 
+
