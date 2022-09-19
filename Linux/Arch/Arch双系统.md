@@ -469,11 +469,23 @@ GLFW_IM_MODULE=ibus
 
 - markdown
 
-    - typora（付费）`yay -S typora` 
+    - typora（付费）：`yay -S typora` 
 
     > typora 中 emoji 表情显示为一个方块：缺少 Segoe 系列字体
     >
     > 从 windows 中将这些字体全部拿出来并安装 :grin: 即可
+
+    - remarkable（免费）：`yay -S remarkable` 
+
+    > 预览在编辑区发生改动后总是回到最开始的部分，不会跟随编辑区移动或由用户控制，不好用
+
+    - haroopad（免费）：`yay -S haroopad` 
+
+    > 预览区围栏代码块语法有 bug，不好用
+
+    - retext（免费）：`pacman -S retext` 
+
+    > 没有上面那两个的 bug，但是十分简洁
 
 - dbeaver
 
@@ -499,4 +511,8 @@ GLFW_IM_MODULE=ibus
     中文使用者还需安装中文包：`yay -S wps-office-mui-zh-cn` 
 
     可选的符号字体：`yay -S ttf-wps-fonts` 
+    
+- 坚果云
+
+    `yay -S nutstore` 
 
