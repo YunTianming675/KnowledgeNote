@@ -461,6 +461,12 @@ GLFW_IM_MODULE=ibus
 
         USB 设备不能连接到虚拟机：`sudo systemctl start vmware-usbarbitrator` 
 
+        安装失败，找不到 `gcr` 包：
+
+        - 在 arch 的 Package 界面 [gcr](https://archlinux.org/packages/extra/x86_64/gcr/) 下载，然后本地安装：
+
+            `sudo pacman -U package_name` 
+
 - markdown
 
     - typora（付费）`yay -S typora` 
@@ -468,6 +474,15 @@ GLFW_IM_MODULE=ibus
     > typora 中 emoji 表情显示为一个方块：缺少 Segoe 系列字体
     >
     > 从 windows 中将这些字体全部拿出来并安装 :grin: 即可
+
+- dbeaver
+
+    - 一个数据库图形管理界面软件
+
+        `sudo pacman -S dbeaver` 
+
+    - China 中的源可能没有这个软件，可以编辑 `/etc/mirrorlist` 添加其他源进行下载
+
 
 ## 05.2 Office
 
