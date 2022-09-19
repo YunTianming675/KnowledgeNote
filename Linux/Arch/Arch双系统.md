@@ -422,4 +422,66 @@ GLFW_IM_MODULE=ibus
     > KDE 下全局菜单失效：
     >
     > 安装：`pacman -S libdbusmenu-glib` 
+    
+- VMWare（收费，但许可证网络上到处都是 :satisfied: ）
+
+    - 先决条件：在 bios 中开启 CPU 虚拟化
+    - 各版本：
+
+    ```bash
+    aur/vmware-workstation11 11.1.4-21 (+2 0.00) 
+    aur/vmware-workstation-tech-preview 16540321-2 (+2 0.00) 
+    aur/vmware-workstation15 15.5.7-9 (+3 0.01) 
+    aur/vmware-workstation-openrc 16.2.4-1 (+4 0.11) 
+    aur/vmware-workstation14 14.1.7-16 (+5 0.00) 
+    aur/vmware-workstation12 12.5.9-23 (+9 0.00) 
+    aur/vmware-workstation 16.2.4-1 (+171 2.07)
+    archlinuxcn/vmware-workstation-macos 16.2.4-1 (431.9 MiB 881.4 MiB) 
+    archlinuxcn/vmware-workstation 16.2.4-1 (427.2 MiB 875.3 MiB)
+    ```
+
+    - 下面这些包请确认已安装：
+
+    ```bash
+    fuse2
+    gtkmm
+    linux-headers
+    ncurses
+    libcanberra
+    pcsclite
+    ```
+
+    - 可能遇到的问题：
+
+        模块 vmmon 未启动：	`sudo modprode -a vmmon` 
+
+        模块 vmw_vmci 未启动：`sudo modprobe -a vmw_vmci` 
+
+        网络服务未启动/虚拟机没有网络：`sudo systemctl start vmware-networks` 
+
+        USB 设备不能连接到虚拟机：`sudo systemctl start vmware-usbarbitrator` 
+
+- markdown
+
+    - typora（付费）`yay -S typora` 
+
+    > typora 中 emoji 表情显示为一个方块：缺少 Segoe 系列字体
+    >
+    > 从 windows 中将这些字体全部拿出来并安装 :grin: 即可
+
+## 05.2 Office
+
+- Libreoffice
+
+    稳定版：`pacman -S libreoffice-still` ，中文支持：`pacman -S libreoffice-still-zh-cn` 
+
+- WPS
+
+    中国大陆版：`yay -S wps-office-cn` 
+
+    国际版：`yay -S wps-office` 
+
+    中文使用者还需安装中文包：`yay -S wps-office-mui-zh-cn` 
+
+    可选的符号字体：`yay -S ttf-wps-fonts` 
 
