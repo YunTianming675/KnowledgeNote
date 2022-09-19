@@ -463,7 +463,7 @@ GLFW_IM_MODULE=ibus
 
         安装失败，找不到 `gcr` 包：
 
-        - 在 arch 的 Package 界面 [gcr](https://archlinux.org/packages/extra/x86_64/gcr/) 下载，然后本地安装：
+        - 在 arch 的 Package [gcr](https://archlinux.org/packages/extra/x86_64/gcr/) 界面下载，然后本地安装：
 
             `sudo pacman -U package_name` 
 
