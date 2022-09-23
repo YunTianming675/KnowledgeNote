@@ -36,7 +36,7 @@ source ~/.local/bin/virtualenvwrapper.sh # 一般用户
 > 2022-09-23 尝试在一台新的 Arch 上安装虚拟环境，结果安装配置好后怎么都无法使用？
 
 - 安装：`pacman -S python-virtualenvwrapper` 
-- 之后的配置同上
+- 之后的配置同上，除执行脚本位置外，`source /usr/bin/virtualenvwrapper.sh` 
 
 ## 虚拟环境的使用
 
