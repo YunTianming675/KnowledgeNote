@@ -43,6 +43,9 @@ source ~/.local/bin/virtualenvwrapper.sh # 一般用户
 - 安装额外的 Python 版本，[下载地址](https://www.python.org/downloads/) ，请下载源码的 tar 压缩包或其它压缩包
 - 解压编译前确认下列包已安装：`gcc`、`zlib`、`libffi` 
 - 解压源码，进入所在目录，指定安装目录：`./configure --prefix=/opt/python2.7 --with-ssl` 
+
+> 更完整的配置：`./configure --prefix=/opt/python3.9 --enable-shared --enable-optimizations --with-ssl` 
+
 - 编译：`make` 
 - 安装：`make install` 
 - 在指定目录即可找到 Python 可执行文件，随后可通过使用别名或添加路径的方法在终端中使用，但这里是为虚拟环境准备的，就不再进行其它操作
