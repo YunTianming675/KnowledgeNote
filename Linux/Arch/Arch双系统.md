@@ -422,6 +422,10 @@ GLFW_IM_MODULE=ibus
     > KDE 下全局菜单失效：
     >
     > 安装：`pacman -S libdbusmenu-glib` 
+    >
+    > ZSH 出现方块：
+    >
+    > 设置中搜索 `terminal` ，在 `Font Family` 中添加 `'NotoMono Nerd Font'` ，请确保安装了 Nerd Font 系列字体
     
 - VMWare（收费，但许可证网络上到处都是 :satisfied: ）
 
