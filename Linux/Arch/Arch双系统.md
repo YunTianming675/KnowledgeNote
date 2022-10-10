@@ -45,7 +45,7 @@ systemctl disable reflector
 
 - 取消注释
 
-    `起始行，结束行s/^/注释符//g` 
+    `起始行，结束行s/^注释符//g` 
 
 > 这里提供了修改后的 mirrorlist：[mirrorlist](./OtherFiles/mirrorlist) 
 
