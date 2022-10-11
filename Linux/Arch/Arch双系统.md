@@ -320,6 +320,7 @@ sudo pacman -S fcitx5 # 框架
 sudo pacman -S fcitx5-chinese-addons # 中文输入方式
 sudo pacman -S fcitx5-pinyin-zhwiki # 适用于拼音输入法的词库
 sudo pacman -S fcitx5-qt # 对QT5程序的支持
+sudo pacman -S fcitx5-configtool # 图形配置界面
 
 # 修改 /etc/environment，添加这些环境变量：
 GTK_IM_MODULE=fcitx
@@ -345,6 +346,8 @@ GLFW_IM_MODULE=ibus
         - 开发版：`yay -S google-chrome-dev` 
         - 测试版：`yay -S google-chrome-beta` 
     - firefox：`pacman -S firefox` ，中文支持：`pacman -S  firefox-i18n-zh-cn` 
+
+5. 安装 packagekit-qt5 以使软件中心可用
 
 ## 04.1 各类驱动
 
@@ -407,6 +410,8 @@ GLFW_IM_MODULE=ibus
     `pulseaudio -k` 
 
     > 如果报错，请重启系统
+    
+6. 硬件编解码：[wiki](https://wiki.archlinux.org/title/Hardware_video_acceleration#Verification) 
 
 # 05. 其他软件
 
