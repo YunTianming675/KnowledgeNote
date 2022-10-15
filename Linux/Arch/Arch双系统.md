@@ -503,6 +503,13 @@ GLFW_IM_MODULE=ibus
         `sudo pacman -S dbeaver` 
 
     - China 中的源可能没有这个软件，可以编辑 `/etc/mirrorlist` 添加其他源进行下载
+    
+- android-studio
+
+    - Android IDE
+
+        `yay -S android-studio` 稳定分支
+
 
 
 ## 05.2 Office
