@@ -513,6 +513,8 @@ GLFW_IM_MODULE=ibus
     - Android IDE
 
         `yay -S android-studio` 稳定分支
+        
+    - 本地调试支持：`yay -S ncurses5-compat-libs` 或 `pacman -S ncurses5-compat-libs` (Archlinuxcn)
 
 
 
