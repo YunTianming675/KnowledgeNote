@@ -244,6 +244,10 @@ systemctl enable NetworkManager.service
 ```
 
 - 重启即可
+- `kde-applications` 是 KDE 全家桶，希望系统简洁则无需安装
+    - 安装 dolphin：`pacman -S dolphin` 
+
+- `kde-utilities` 包含一些必要工具，而没有 `kde-applications` 的臃肿
 
 > 我使用的电脑为笔记本，Intel 核显和 Nvidia 独显的混合模式，使用 plasma-wayland-session  框架时外接显示器掉帧严重，使用 X11 还是 wayland 需要自己考虑
 
