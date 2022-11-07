@@ -232,3 +232,62 @@ connect(btn2, &QPushButton::clicked, this, [=](){this->close();});
 ## 02.1 QMainWindow
 
 QMainWindow 是一个为用户提供主窗口程序的类，包含一个菜单栏（menu bar）、多个工具栏（tool bar）、多个锚接部件（dock widgets）、一个状态栏（status bar）及一个中心部件（central widget）
+
+## 02.2 菜单栏
+
+- 菜单栏最多只有一个
+- 代码示例
+
+```c++
+// 解决菜单栏不显示的问题
+// 代码模式：自己的类->setNativeMenuBar(false);
+// ui模式：
+ui->menubar->setNativeMenuBar(false);
+
+// 创建菜单栏，菜单栏最多只能有一个
+QMenuBar *bar = menuBar();
+// 将菜单栏放入到窗口中
+setMenuBar(bar);
+
+// 但由于菜单栏是空的，所以它依然不会显示
+// 创建菜单
+QMenu *fileMenu = bar->addMenu("File");
+QMenu *editMenu = bar->addMenu("Edit");
+
+// 创建菜单项
+QAction *newAction = fileMenu->addAction("new");
+// 添加分隔线
+fileMenu->addSeparator();
+QAction *openAction = fileMenu->addAction("open");
+```
+
+## 02.3 工具栏
+
+- 工具栏可以有多个
+- 代码示例
+
+```c++
+// 工具栏，可以有多个
+QToolBar *toolBar = new QToolBar(this);
+// 将工具栏放到窗口中，默认在上方
+// addToolBar(toolBar);
+// 将默认位置放到左边
+addToolBar(Qt::LeftToolBarArea, toolBar);
+// 设置只允许左右停靠
+toolBar->setAllowedAreas(Qt::LeftToolBarArea | Qt::RightToolBarArea);
+// 设置不允许浮动
+toolBar->setFloatable(false);
+// 设置移动（总开关），此时工具栏不允许移动
+toolBar->setMovable(false);
+
+// 在工具栏中设置内容
+toolBar->addAction(newAction);
+// 添加分隔线
+toolBar->addSeparator();
+toolBar->addAction(openAction);
+
+// 工具栏中添加控件
+QPushButton *btn = new QPushButton("aa", this);
+toolBar->addWidget(btn);
+```
+
