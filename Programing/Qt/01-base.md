@@ -291,3 +291,88 @@ QPushButton *btn = new QPushButton("aa", this);
 toolBar->addWidget(btn);
 ```
 
+## 02.4 状态栏
+
+- 最多有一个
+- 代码示例
+
+```c++
+// 状态栏，最多只能有一个
+QStatusBar *stBar = statusBar();
+// 设置到窗口中
+setStatusBar(stBar);
+// 放标签控件
+QLabel *label = new QLabel("hint", this);
+stBar->addWidget(label);
+// 将标签放在右边
+QLabel *label1 = new QLabel("hint right", this);
+stBar->addPermanentWidget(label1);
+```
+
+## 02.5 铆接部件
+
+- 可以有多个
+- 代码示例
+
+```c++
+// 铆接部件（浮动窗口）可以有多个
+QDockWidget *dockWidget = new QDockWidget("float", this);
+// 将铆接部件放在下面，注意是在核心部件的下面
+addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
+// 设置停靠范围仅上下
+dockWidget->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
+```
+
+## 02.6 中心部件
+
+- 只能有一个
+- 代码示例
+
+```c++
+// 中心部件，只能有一个
+QTextEdit *edit = new QTextEdit(this);
+setCentralWidget(edit);
+```
+
+## 02.7 添加资源文件
+
+1. 将所需的资源文件复制到工程目录
+2. 对项目右键->添加新文件->Qt 模板下的 Qt Resource File，给它起个名字，比如 `res` ，这将在工程目录下生成一个 `res.qrc` 文件
+3. 如果使用 cmake 构建，可能还需要在 CMakeLists.txt 中添加 `res.qrc` 
+4. `res.qrc` 不能双击打开，需要右键选择 `Open in Editor` 
+5. 选择 `Add Prefix` ，然后在下面添加一个前缀，前缀根据目的分类，无需分类的话可以仅写一个 `/` 
+6. 点击 `Add File` ，定位到资源文件夹进行添加
+7. 点击构建后 `res.qrc` 即可展开
+8. 使用：`: + 前缀名 + 文件名` 
+
+```c++
+ui->actionNew->setIcon(QIcon(":/Image/Luffy.png"));
+ui->actionOpen->setIcon(QIcon(":/Image/LuffyQ.png"));
+```
+
+## 02.8 QDialog
+
+- 模态对话框：阻塞，不能对其它窗口进行操作
+
+```c++
+QDialog dlg(this);
+dlg.resize(200, 100);
+dlg.exec();
+```
+
+- 非模态：可以对其它窗口进行操作
+
+```c++
+// 在栈上的对象在匿名函数执行完后消失，导致窗口一闪而过
+// QDialog dlg2(this);
+// 应该把对象放在堆区
+QDialog *dlg2 = new QDialog(this);
+dlg2->resize(200, 100);
+// 设置当窗口关闭时释放掉内存，避免内存泄漏
+// dlg2的父对象是主窗口，dlg2所使用的内存仅在主窗口关闭时被释放
+dlg2->setAttribute(Qt::WA_DeleteOnClose);
+dlg2->show();
+```
+
+
+
