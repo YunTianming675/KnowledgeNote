@@ -126,3 +126,106 @@ read -p "Please input (Y/N)" yn
 echo "I don't kone what your choice is" && exit 0
 ```
 
+# 向 scripts 传递参数
+
+执行后将显示：
+
+- 程序的文件名
+- 参数总数
+- 参数数量小于 2 则报告数量太少
+- 输出全部参数
+- 输出第一个和第二个参数
+
+```bash
+#! /bin/bash
+
+echo "The scripts name is: ${0}"
+echo "Total parameter number is: $#"
+[ "$#" -lt 2 ] && echo "The number of parameter is less than 2. Stop here." && exit 0
+echo "Your whole parameter is: '$@'"
+echo "The 1st parameter is: ${1}"
+echo "The 2st parameter is: ${2}"
+exit 0
+```
+
+# shift 移动变量
+
+- shift 表示拿掉前面几个变量的意思
+
+```bash
+#! /bin/bash
+
+echo "Total parameter number is: $#"
+echo "Your whole parameter is: '$@'"
+shift
+echo "Total parameter number is: $#"
+echo "Your whole parameter is: '$@'"
+shift 3
+echo "Total parameter number is: $#"
+echo "Your whole parameter is: '$@'"
+```
+
+- 运行结果：
+
+```
+$ bash ./shift_paras.sh one two three four five six
+Total parameter number is: 6
+Your whole parameter is: 'one two three four five six'
+Total parameter number is: 5
+Your whole parameter is: 'two three four five six'
+Total parameter number is: 2
+Your whole parameter is: 'five six'
+```
+
+# 使用 if
+
+```bash
+#! /bin/bash
+
+read -p "Please input (Y/N)" yn
+if [ "${yn}" == "Y" ] || [ "${yn}" == "y" ]; then
+    echo "OK, continue"
+    exit 0
+fi
+if [ "${yn}" == "N"] || [ "${yn}" == "n" ]; then
+    echo "Oh, interrupt"
+    exit 0
+fi
+echo "I don't kone what your choice is" && exit 0
+```
+
+# 多重 if
+
+```bash
+#! /bin/bash
+
+if [ "${1}" == "hello" ]; then
+    echo "Hello, how are you"
+elif [ "${1}" == "" ]; then
+    echo "You must input parameters, example: '${0} hello'"
+else
+    echo "The only parameter is 'hello'"
+fi
+exit 0
+```
+
+# 分支判断
+
+```bash
+#! /bin/bash
+
+case ${1} in
+    "hello")
+        echo "Hello, how are you"
+        ;;  
+    "") 
+        echo "You must input parameters, example: '${0} hello'"
+        ;;  
+    *)  
+        echo "Usage '${0} hello'"
+        ;;  
+esac
+
+```
+
+- `;;` ：表示程序段的结束
