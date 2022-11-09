@@ -374,5 +374,17 @@ dlg2->setAttribute(Qt::WA_DeleteOnClose);
 dlg2->show();
 ```
 
+## 02.9 标准对话框
 
+Qt 内置的一系列对话框，用于简化开发
+
+- 选择颜色：QColorDialog
+- 选择文件或者目录：QFileDialog
+- 选择字体：QFontDialog
+- 允许用户输入一个值，并将其值返回：QInputDialog
+- 模态对话框，用于显示信息、询问问题等：QMessageBox
+- 为打印机提供纸张相关的选项：QPageSetupDialog
+- 打印机配置：QPrintDialog
+- 打印预览：QPrintPreviewDialog
+- 显示操作过程：QprogressDialog
 
