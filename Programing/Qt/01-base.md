@@ -388,3 +388,143 @@ Qt 内置的一系列对话框，用于简化开发
 - 打印预览：QPrintPreviewDialog
 - 显示操作过程：QprogressDialog
 
+### 02.9.1 消息对话框
+
+- 使用静态成员函数创建对话框
+
+参数：
+
+1. 父窗口
+2. 标题
+3. 显示内容
+4. 按键类型
+5. 回车默认关联的按键
+
+- 创建错误对话框：`QMessageBox::critical(this, "criticl", "Error");` 
+- 创建信息对话框：`QMessageBox::information(this, "information", "centent");` 
+- 创建提问对话框
+
+```c++
+if (QMessageBox::Save == QMessageBox::question(this, "question", "question", QMessageBox::Save|QMessageBox::Cancel, QMessageBox::Cancel))
+{
+	qDebug() << "click save";
+}
+else
+{
+	qDebug() << "click cancle";
+}
+```
+
+- 创建警告对话框：`QMessageBox::warning(this, "warn", "warn");` 
+- 创建颜色对话框：
+
+```c++
+QColor color = QColorDialog::getColor(QColor(255, 0, 0));
+qDebug() << "r=" << color.red() << ", g=" << color.green() << ",b=" << color.blue();
+```
+
+- 创建颜色对话框：
+
+```c++
+QString str = QFileDialog::getOpenFileName(this, "Open Files", "C:\\Users\\28379\\Desktop", "(*.txt)");
+qDebug() << str;
+```
+
+> 第四个参数用于类型过滤
+
+- 创建字体对话框：
+
+```c++
+bool flag;
+QFont font = QFontDialog::getFont(&flag, QFont("华文彩云", 36));
+qDebug() << "字体：" << font.family() << "，字号：" << font.pointSize() << "，是否加粗" << font.bold() << "，是否斜体：" << font.italic();
+```
+
+## 02.10 界面布局
+
+- 选取 widget 进行布局，使用水平、垂直或栅格布局
+- 利用弹簧进行布局
+
+### 02.10.1 控件-按钮组
+
+- `Push Button` 一般用于显示文字，`Tool Button` 一般才会添加 icon
+- checkBox 接收点击消息
+
+```c++
+connect(ui->checkBox_4, &QCheckBox::stateChanged, [=](int state){
+    qDebug() << state;
+});
+```
+
+> 共有三种状态：0 = 未勾选，1 = 部分勾选，2 = 完全勾选，要开启部分勾选需要打开 `tristate` 属性
+>
+> ![](./pic/Snipaste_2022-11-11_17-57-02.png)
+
+### 02.10.2 QListWidget
+
+- 向其中添加内容
+
+```c++
+QListWidgetItem *item = new QListWidgetItem("QListWidgetItem01");
+ui->listWidget->addItem(item);
+```
+
+- item 内容文本居中：`item->setTextAlignment(Qt::AlignCenter);` 
+- 一次添加多个 item
+
+```c++
+QStringList list;
+list << "QListWidgetItem01" << "QListWidgetItem02" << "QListWidgetItem03";
+ui->listWidget->addItems(list);
+```
+
+### 02.10.3 QTreeWidget
+
+- 设置水平头：`ui->treeWidget->setHeaderLabels(QStringList() << "英雄" << "英雄介绍");` 
+- 添加头节点：
+
+```c++
+QTreeWidgetItem *liItem = new QTreeWidgetItem(QStringList() << "力量");
+QTreeWidgetItem *minItem = new QTreeWidgetItem(QStringList() << "敏捷");
+QTreeWidgetItem *zhiItem = new QTreeWidgetItem(QStringList() << "智力");
+ui->treeWidget->addTopLevelItem(liItem);
+ui->treeWidget->addTopLevelItem(minItem);
+ui->treeWidget->addTopLevelItem(zhiItem);
+```
+
+- 追加子节点：
+
+```c++
+QStringList heroL1;
+heroL1 << "刚被猪" << "前排坦克，能在吸收伤害的同时造成可观的范围输出";
+QTreeWidgetItem *l1 = new QTreeWidgetItem(heroL1);
+liItem->addChild(l1);
+```
+
+> 在只有一个控件时，直接对顶层窗口使用任意布局即可让控件占满整个窗口
+>
+> ![](./pic/Snipaste_2022-11-11_19-17-53.png)
+
+### 02.10.4 QTableWidget
+
+- 设置列数：`ui->tableWidget->setColumnCount(3);` 
+- 设置水平表头：`ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "姓名" << "性别" << "年龄");` 
+- 设置行数：`ui->tableWidget->setRowCount(5);` 
+- 设置内容：`ui->tableWidget->setItem(0, 0, new QTableWidgetItem("亚瑟"));` 
+- 一个利用循环一次填充大量内容的示例：
+
+```c++
+QStringList nameList;
+nameList << "亚瑟" << "赵云" << "张飞" << "关羽" << "花木兰";
+QList<QString> sexList;
+sexList << "男" << "男" << "男" << "男" << "女";
+for (int i = 0; i < 5; i++)
+{
+    int col = 0;
+    ui->tableWidget->setItem(i, col++, new QTableWidgetItem(nameList[i]));
+    ui->tableWidget->setItem(i, col++, new QTableWidgetItem(sexList.at(i)));
+    // int转QString
+    ui->tableWidget->setItem(i, col++, new QTableWidgetItem(QString::number(i+18)));
+}
+```
+
