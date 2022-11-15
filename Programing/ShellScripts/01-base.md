@@ -229,3 +229,105 @@ esac
 ```
 
 - `;;` ：表示程序段的结束
+
+# 定义函数
+
+```bash
+#! /bin/bash
+
+function printit() {
+    echo -n "Your choise is: "
+}
+
+echo "This program will print your selection."
+case ${1} in
+    "one")
+        printit
+        echo ${1} | tr 'a-z' 'A-Z'
+        ;;  
+    "two")
+        printit
+        echo ${1} | tr 'a-z' 'A-Z'
+        ;;  
+    "three")    
+        printit
+        echo ${1} | tr 'a-z' 'A-Z'
+        ;;  
+    *)  
+        echo "Usage ${0} {one;two;three}"
+        ;;  
+esac
+
+```
+
+- 注意：函数也拥有内置变量 `${0} ${1} ...` ，但这些和 scripts 的 `${0} ${1} ...` 不同。比如上面的函数调用如果使用 `printit 1` 则在函数内部 `${1}` 的值为 `1` 
+
+# 循环
+
+## 不定循环
+
+- 条件成立时进行循环
+
+```bash
+while [condition]
+do 
+	statement...
+done
+```
+
+- 条件成立时终止循环
+
+```bash
+until [condition]
+do 
+	statement...
+done
+```
+
+直到用户输入 yes 或 YES 才结束循环
+
+```bash
+#! /bin/bash
+
+while [ "${yn}" != "yes" -a "${yn}" != "YES" ]
+do
+    read -p "Please input yes/YES to top this program: " yn
+done
+echo "OK"
+```
+
+## 固定循环
+
+```bash
+for var in con1 con2 con3
+do
+	statement...
+done
+```
+
+- 在工作时，var 的内容分别是 con1 con2 con3
+
+显示所有用户的 id
+
+```bash
+#! /bin/bash
+
+users=$(cut -d ':' -f1 /etc/passwd)
+for username in ${users}
+do
+    id ${username}
+done
+```
+
+- `for var in $(seq 1 100)` 让 var 在 1 到 100 循环，等效于 `for var in ${1..100}` 
+
+# shell scripts Debug
+
+sh
+
+| 选项 | 含义                                   |
+| ---- | -------------------------------------- |
+| -n   | 不执行，仅检查语法，无返回结果即无错误 |
+| -x   | 输出使用到的 scripts 内容              |
+| -v   | 执行前，先将内容输出到屏幕上           |
+
