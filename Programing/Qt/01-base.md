@@ -232,3 +232,299 @@ connect(btn2, &QPushButton::clicked, this, [=](){this->close();});
 ## 02.1 QMainWindow
 
 QMainWindow 是一个为用户提供主窗口程序的类，包含一个菜单栏（menu bar）、多个工具栏（tool bar）、多个锚接部件（dock widgets）、一个状态栏（status bar）及一个中心部件（central widget）
+
+## 02.2 菜单栏
+
+- 菜单栏最多只有一个
+- 代码示例
+
+```c++
+// 解决菜单栏不显示的问题
+// 代码模式：自己的类->setNativeMenuBar(false);
+// ui模式：
+ui->menubar->setNativeMenuBar(false);
+
+// 创建菜单栏，菜单栏最多只能有一个
+QMenuBar *bar = menuBar();
+// 将菜单栏放入到窗口中
+setMenuBar(bar);
+
+// 但由于菜单栏是空的，所以它依然不会显示
+// 创建菜单
+QMenu *fileMenu = bar->addMenu("File");
+QMenu *editMenu = bar->addMenu("Edit");
+
+// 创建菜单项
+QAction *newAction = fileMenu->addAction("new");
+// 添加分隔线
+fileMenu->addSeparator();
+QAction *openAction = fileMenu->addAction("open");
+```
+
+## 02.3 工具栏
+
+- 工具栏可以有多个
+- 代码示例
+
+```c++
+// 工具栏，可以有多个
+QToolBar *toolBar = new QToolBar(this);
+// 将工具栏放到窗口中，默认在上方
+// addToolBar(toolBar);
+// 将默认位置放到左边
+addToolBar(Qt::LeftToolBarArea, toolBar);
+// 设置只允许左右停靠
+toolBar->setAllowedAreas(Qt::LeftToolBarArea | Qt::RightToolBarArea);
+// 设置不允许浮动
+toolBar->setFloatable(false);
+// 设置移动（总开关），此时工具栏不允许移动
+toolBar->setMovable(false);
+
+// 在工具栏中设置内容
+toolBar->addAction(newAction);
+// 添加分隔线
+toolBar->addSeparator();
+toolBar->addAction(openAction);
+
+// 工具栏中添加控件
+QPushButton *btn = new QPushButton("aa", this);
+toolBar->addWidget(btn);
+```
+
+## 02.4 状态栏
+
+- 最多有一个
+- 代码示例
+
+```c++
+// 状态栏，最多只能有一个
+QStatusBar *stBar = statusBar();
+// 设置到窗口中
+setStatusBar(stBar);
+// 放标签控件
+QLabel *label = new QLabel("hint", this);
+stBar->addWidget(label);
+// 将标签放在右边
+QLabel *label1 = new QLabel("hint right", this);
+stBar->addPermanentWidget(label1);
+```
+
+## 02.5 铆接部件
+
+- 可以有多个
+- 代码示例
+
+```c++
+// 铆接部件（浮动窗口）可以有多个
+QDockWidget *dockWidget = new QDockWidget("float", this);
+// 将铆接部件放在下面，注意是在核心部件的下面
+addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
+// 设置停靠范围仅上下
+dockWidget->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
+```
+
+## 02.6 中心部件
+
+- 只能有一个
+- 代码示例
+
+```c++
+// 中心部件，只能有一个
+QTextEdit *edit = new QTextEdit(this);
+setCentralWidget(edit);
+```
+
+## 02.7 添加资源文件
+
+1. 将所需的资源文件复制到工程目录
+2. 对项目右键->添加新文件->Qt 模板下的 Qt Resource File，给它起个名字，比如 `res` ，这将在工程目录下生成一个 `res.qrc` 文件
+3. 如果使用 cmake 构建，可能还需要在 CMakeLists.txt 中添加 `res.qrc` 
+4. `res.qrc` 不能双击打开，需要右键选择 `Open in Editor` 
+5. 选择 `Add Prefix` ，然后在下面添加一个前缀，前缀根据目的分类，无需分类的话可以仅写一个 `/` 
+6. 点击 `Add File` ，定位到资源文件夹进行添加
+7. 点击构建后 `res.qrc` 即可展开
+8. 使用：`: + 前缀名 + 文件名` 
+
+```c++
+ui->actionNew->setIcon(QIcon(":/Image/Luffy.png"));
+ui->actionOpen->setIcon(QIcon(":/Image/LuffyQ.png"));
+```
+
+## 02.8 QDialog
+
+- 模态对话框：阻塞，不能对其它窗口进行操作
+
+```c++
+QDialog dlg(this);
+dlg.resize(200, 100);
+dlg.exec();
+```
+
+- 非模态：可以对其它窗口进行操作
+
+```c++
+// 在栈上的对象在匿名函数执行完后消失，导致窗口一闪而过
+// QDialog dlg2(this);
+// 应该把对象放在堆区
+QDialog *dlg2 = new QDialog(this);
+dlg2->resize(200, 100);
+// 设置当窗口关闭时释放掉内存，避免内存泄漏
+// dlg2的父对象是主窗口，dlg2所使用的内存仅在主窗口关闭时被释放
+dlg2->setAttribute(Qt::WA_DeleteOnClose);
+dlg2->show();
+```
+
+## 02.9 标准对话框
+
+Qt 内置的一系列对话框，用于简化开发
+
+- 选择颜色：QColorDialog
+- 选择文件或者目录：QFileDialog
+- 选择字体：QFontDialog
+- 允许用户输入一个值，并将其值返回：QInputDialog
+- 模态对话框，用于显示信息、询问问题等：QMessageBox
+- 为打印机提供纸张相关的选项：QPageSetupDialog
+- 打印机配置：QPrintDialog
+- 打印预览：QPrintPreviewDialog
+- 显示操作过程：QprogressDialog
+
+### 02.9.1 消息对话框
+
+- 使用静态成员函数创建对话框
+
+参数：
+
+1. 父窗口
+2. 标题
+3. 显示内容
+4. 按键类型
+5. 回车默认关联的按键
+
+- 创建错误对话框：`QMessageBox::critical(this, "criticl", "Error");` 
+- 创建信息对话框：`QMessageBox::information(this, "information", "centent");` 
+- 创建提问对话框
+
+```c++
+if (QMessageBox::Save == QMessageBox::question(this, "question", "question", QMessageBox::Save|QMessageBox::Cancel, QMessageBox::Cancel))
+{
+	qDebug() << "click save";
+}
+else
+{
+	qDebug() << "click cancle";
+}
+```
+
+- 创建警告对话框：`QMessageBox::warning(this, "warn", "warn");` 
+- 创建颜色对话框：
+
+```c++
+QColor color = QColorDialog::getColor(QColor(255, 0, 0));
+qDebug() << "r=" << color.red() << ", g=" << color.green() << ",b=" << color.blue();
+```
+
+- 创建颜色对话框：
+
+```c++
+QString str = QFileDialog::getOpenFileName(this, "Open Files", "C:\\Users\\28379\\Desktop", "(*.txt)");
+qDebug() << str;
+```
+
+> 第四个参数用于类型过滤
+
+- 创建字体对话框：
+
+```c++
+bool flag;
+QFont font = QFontDialog::getFont(&flag, QFont("华文彩云", 36));
+qDebug() << "字体：" << font.family() << "，字号：" << font.pointSize() << "，是否加粗" << font.bold() << "，是否斜体：" << font.italic();
+```
+
+## 02.10 界面布局
+
+- 选取 widget 进行布局，使用水平、垂直或栅格布局
+- 利用弹簧进行布局
+
+### 02.10.1 控件-按钮组
+
+- `Push Button` 一般用于显示文字，`Tool Button` 一般才会添加 icon
+- checkBox 接收点击消息
+
+```c++
+connect(ui->checkBox_4, &QCheckBox::stateChanged, [=](int state){
+    qDebug() << state;
+});
+```
+
+> 共有三种状态：0 = 未勾选，1 = 部分勾选，2 = 完全勾选，要开启部分勾选需要打开 `tristate` 属性
+>
+> ![](./pic/Snipaste_2022-11-11_17-57-02.png)
+
+### 02.10.2 QListWidget
+
+- 向其中添加内容
+
+```c++
+QListWidgetItem *item = new QListWidgetItem("QListWidgetItem01");
+ui->listWidget->addItem(item);
+```
+
+- item 内容文本居中：`item->setTextAlignment(Qt::AlignCenter);` 
+- 一次添加多个 item
+
+```c++
+QStringList list;
+list << "QListWidgetItem01" << "QListWidgetItem02" << "QListWidgetItem03";
+ui->listWidget->addItems(list);
+```
+
+### 02.10.3 QTreeWidget
+
+- 设置水平头：`ui->treeWidget->setHeaderLabels(QStringList() << "英雄" << "英雄介绍");` 
+- 添加头节点：
+
+```c++
+QTreeWidgetItem *liItem = new QTreeWidgetItem(QStringList() << "力量");
+QTreeWidgetItem *minItem = new QTreeWidgetItem(QStringList() << "敏捷");
+QTreeWidgetItem *zhiItem = new QTreeWidgetItem(QStringList() << "智力");
+ui->treeWidget->addTopLevelItem(liItem);
+ui->treeWidget->addTopLevelItem(minItem);
+ui->treeWidget->addTopLevelItem(zhiItem);
+```
+
+- 追加子节点：
+
+```c++
+QStringList heroL1;
+heroL1 << "刚被猪" << "前排坦克，能在吸收伤害的同时造成可观的范围输出";
+QTreeWidgetItem *l1 = new QTreeWidgetItem(heroL1);
+liItem->addChild(l1);
+```
+
+> 在只有一个控件时，直接对顶层窗口使用任意布局即可让控件占满整个窗口
+>
+> ![](./pic/Snipaste_2022-11-11_19-17-53.png)
+
+### 02.10.4 QTableWidget
+
+- 设置列数：`ui->tableWidget->setColumnCount(3);` 
+- 设置水平表头：`ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "姓名" << "性别" << "年龄");` 
+- 设置行数：`ui->tableWidget->setRowCount(5);` 
+- 设置内容：`ui->tableWidget->setItem(0, 0, new QTableWidgetItem("亚瑟"));` 
+- 一个利用循环一次填充大量内容的示例：
+
+```c++
+QStringList nameList;
+nameList << "亚瑟" << "赵云" << "张飞" << "关羽" << "花木兰";
+QList<QString> sexList;
+sexList << "男" << "男" << "男" << "男" << "女";
+for (int i = 0; i < 5; i++)
+{
+    int col = 0;
+    ui->tableWidget->setItem(i, col++, new QTableWidgetItem(nameList[i]));
+    ui->tableWidget->setItem(i, col++, new QTableWidgetItem(sexList.at(i)));
+    // int转QString
+    ui->tableWidget->setItem(i, col++, new QTableWidgetItem(QString::number(i+18)));
+}
+```
+
