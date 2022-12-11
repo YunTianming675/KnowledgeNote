@@ -14,6 +14,8 @@
 
 ## reset
 
+- 回溯，`git reset [option] commitID` 
+
 ## commit
 
 ## log
