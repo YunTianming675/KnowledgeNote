@@ -110,3 +110,27 @@ Button 没有 `color` 这个属性，一般通过 `background` 属性去设置
 ```
 
 - 在没有按下时显示为蓝色，按下后显示为绿色
+
+## 01.4 修改文本
+
+Button 本身可以设置文本，但不能修改文本的样式，需要修改文本的样式，需要利用 `contentItem` 属性
+
+```q
+...
+    Button {
+        id: btn2
+        x: 100
+        width: 90
+        height: 50
+        text: qsTr("Button")
+        contentItem: Text {
+            text: btn2.text
+            font.pixelSize: 18
+            font.bold: true
+            font.italic: true
+        }
+    }
+...
+```
+
+- `contentItem` 不仅可以用来修改字体，它还可以控制如 `Rectangle` 等的其它控件进行重绘
