@@ -946,3 +946,210 @@ Total Test time (real) =   0.01 sec
 
 ### 完整的文件内容
 
+- CMakeLists.txt
+
+```cmake
+cmake_minimum_required(VERSION 3.15)
+project(Tutorial VERSION 1.0)
+
+set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
+set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
+
+option(USE_MYMATH "Use tutorial provided math implementation" ON)
+
+configure_file(TutorialConfig.h.in ..\\TutorialConfig.h)
+
+if(USE_MYMATH)
+  add_subdirectory(MathFunctions)
+  list(APPEND EXTRA_LIBS MathFunctions)
+endif()
+
+add_library(tutorial_compiler_flags INTERFACE)
+target_compile_features(tutorial_compiler_flags INTERFACE cxx_std_11)
+
+add_executable(${PROJECT_NAME} tutorial.cxx)
+
+target_compile_options(tutorial_compiler_flags INTERFACE
+  "$<${gcc_like_cxx}:$<BUILD_INTERFACE:-Wall;-Wextra;-Wshadow;-Wformat=2;-Wunused>>"
+  "$<${msvc_cxx}:$<BUILD_INTERFACE:-W3>>"
+)
+target_link_libraries(Tutorial PUBLIC ${EXTRA_LIBS} tutorial_compiler_flags)
+target_include_directories(Tutorial PUBLIC
+                          "${PROJECT_BINARY_DIR}"
+)
+
+install(TARGETS Tutorial DESTINATION bin)
+install(FILES "TutorialConfig.h"
+  DESTINATION include
+)
+
+enable_testing()
+add_test(NAME Runs COMMAND Tutorial 25)
+add_test(NAME Usage COMMAND Tutorial)
+set_tests_properties(Usage
+  PROPERTIES PASS_REGULAR_EXPRESSION "Usage:.*number"
+)
+add_test(NAME StandardUse COMMAND Tutorial 4)
+set_tests_properties(StandardUse
+  PROPERTIES PASS_REGULAR_EXPRESSION "4 is 2"
+)
+
+function(do_test target arg result)
+  add_test(NAME Comp${arg} COMMAND ${target} ${arg})
+  set_tests_properties(Comp${arg}
+    PROPERTIES PASS_REGULAR_EXPRESSION ${result}
+    )
+endfunction()
+
+# do a bunch of result based tests
+do_test(Tutorial 4 "4 is 2")
+do_test(Tutorial 9 "9 is 3")
+do_test(Tutorial 5 "5 is 2.236")
+do_test(Tutorial 7 "7 is 2.645")
+do_test(Tutorial 25 "25 is 5")
+do_test(Tutorial -25 "-25 is (-nan|nan|0)")
+do_test(Tutorial 0.0001 "0.0001 is 0.01")
+```
+
+# 06. 测试仪表盘支持
+
+略...
+
+# 07. 判断系统依赖
+
+- 如果我们的代码中需要一些目标平台没有的特性，为了避免在构建过程中报错，可以通过本节所示的方法为编译器提供预处理宏定义，然后在源文件中进行条件编译
+
+## 07.1
+
+- `check_cxx_source_compiles()`: 该指令通过编译给定的代码检查编译器是否提供了想要的特性
+- `target_compile_definitions()`: 为目标添加预处理宏定义
+
+1. 想要使用 `check_cxx_source_compiles()` 需要在 CMakeLists.txt 中添加一个包含声明，因为需要在 MathFunctions/CMakeLists.txt 中使用，所以修改该文件如下
+
+```cmake
+include(CheckCXXSourceCompiles)
+```
+
+2. 在 MathFunctions/CMakeLists.txt 中添加 `check_cxx_source_compiles()`
+
+```cmake
+check_cxx_source_compiles("
+  #include <cmath>
+  int main() {
+    std::log(1.0);
+    return 0;
+  }
+" HAVE_LOG)
+check_cxx_source_compiles("
+  #include <cmath>
+  int main() {
+    std::exp(1.0);
+    return 0;
+  }
+" HAVE_EXP)
+```
+
+3. 根据上面的结果，设置预处理宏，在 MathFunctions/CMakeLists.txt 中
+
+```cmake
+if(HAVE_LOG AND HAVE_EXP)
+  target_compile_definitions(MathFunctions
+                             PRIVATE "HAVE_LOG" "HAVE_EXP")
+endif()
+```
+
+4. 对于 MathFunctions/mysqrt.cxx 中，添加用到的头文件和条件编译
+
+```c++
+#include <cmath>
+...
+#if defined(HAVE_LOG) && defined(HAVE_EXP)
+  double result = std::exp(std::log(x) * 0.5);
+  std::cout << "Computing sqrt of " << x << " to be " << result
+            << " using log and exp" << std::endl;
+#else
+  double result = x;
+#endif
+```
+
+### 完整的文件内容
+
+- MathFunctions/CMakeLists.txt
+
+```cmake
+add_library(MathFunctions mysqrt.cxx)
+
+include(CheckCXXSourceCompiles)
+
+set(installable_libs MathFunctions)
+
+target_link_libraries(MathFunctions tutorial_compiler_flags)
+target_include_directories(MathFunctions
+          INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+install(TARGETS ${installable_libs} DESTINATION lib)
+install(FILES MathFunctions.h DESTINATION include)
+
+check_cxx_source_compiles("
+  #include <cmath>
+  int main() {
+    std::log(1.0);
+    return 0;
+  }
+" HAVE_LOG)
+check_cxx_source_compiles("
+  #include <cmath>
+  int main() {
+    std::exp(1.0);
+    return 0;
+  }
+" HAVE_EXP)
+
+if(HAVE_LOG AND HAVE_EXP)
+  target_compile_definitions(MathFunctions
+                             PRIVATE "HAVE_LOG" "HAVE_EXP")
+endif()
+```
+
+- MathFunctions/mysqrt.cxx
+
+```c++
+#include "mysqrt.h"
+
+#include <iostream>
+#include <cmath>
+
+namespace mathfunctions {
+namespace detail {
+// a hack square root calculation using simple operations
+double mysqrt(double x)
+{
+  if (x <= 0) {
+    return 0;
+  }
+
+#if defined(HAVE_LOG) && defined(HAVE_EXP)
+  double result = std::exp(std::log(x) * 0.5);
+  std::cout << "Computing sqrt of " << x << " to be " << result
+            << " using log and exp" << std::endl;
+#else
+  double result = x;
+#endif
+
+  // do ten iterations
+  for (int i = 0; i < 10; ++i) {
+    if (result <= 0) {
+      result = 0.1;
+    }
+    double delta = x - (result * result);
+    result = result + 0.5 * delta / result;
+    std::cout << "Computing sqrt of " << x << " to be " << result << std::endl;
+  }
+  return result;
+}
+}
+}
+
+```
+
