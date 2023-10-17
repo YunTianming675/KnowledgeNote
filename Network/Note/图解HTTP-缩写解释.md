@@ -76,6 +76,10 @@
 
 # S
 
+## SNS
+
+​	Social Networking Service，社交网络服务
+
 ## SSL
 
 ​	Secure Sockets Layer，安全套接层
