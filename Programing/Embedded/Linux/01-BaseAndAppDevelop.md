@@ -663,3 +663,30 @@ system("ls -l &")
     - 记录锁，父进程对文件加的锁，子进程不会继承
     - 挂起的信号，这是已响应但未处理的信号，子进程不会继承这些信号
 
+### execl()
+
+​	替换进程的执行程序，将原进程的数据段、代码段和堆栈段替换掉
+
+原型：`int execl(const char *pathname, const char *arg, ...)`
+
+- 执行 pathname 所代表的文件路径，接下来的可变参数表示传递的参数，最后一个参数必须以 NULL 作为结束标志
+
+exec 族还有其它函数
+
+```c
+int execl(const char *pathname, const char *arg, ...);
+int execlp(const char *file, const char *arg, ...);
+int execle(const char *pathname, const char *arg, ...);
+int execv(const char *pathname, char *const argv[]);
+int execvp(const char *file, char *const argv[]);
+int execvpe(const char *file, char *const argv[], char *const envp[]);
+```
+
+
+
+可以通过后缀区分它们的作用：
+
+- 包含 l：接受参数列表作为调用程序的参数
+- 包含 p：接受程序名作为参数，在当前执行路径和 PATH 中搜索，不包含 p 的函数调用时必须指定绝对路径
+- 包含 v：子程序参数通过数组装载
+- 包含 e：比其它函数多接收一个指明环境变量列表的参数，通过参数 envp 传递字符串作为新程序的环境变量，每个字符串应表示为 `enviroment = viraables` 的形式
