@@ -690,3 +690,119 @@ int execvpe(const char *file, char *const argv[], char *const envp[]);
 - 包含 p：接受程序名作为参数，在当前执行路径和 PATH 中搜索，不包含 p 的函数调用时必须指定绝对路径
 - 包含 v：子程序参数通过数组装载
 - 包含 e：比其它函数多接收一个指明环境变量列表的参数，通过参数 envp 传递字符串作为新程序的环境变量，每个字符串应表示为 `enviroment = viraables` 的形式
+
+## 05.6 终止进程
+
+正常终止：
+
+- 从 main 函数返回
+- 调用 exit() 函数终止
+- 调用 _exit() 函数终止
+
+异常终止：
+
+- 调用 abort() 函数
+- 由系统信号终止
+
+exit() 和 _exit() 的不同：
+
+![](.\pic\01-BaseAndAppDevelop\Snipaste_2024-02-24_15-18-15.png)
+
+## 05.7 等待进程
+
+通过 wait() 或 waitpid() 函数可以让父进程等待子进程结束
+
+### wait()
+
+原型：`pid_t wait(int *_Nullable wstatus);`
+
+wait() 被调用时，父进程将被暂停，直到有信号来或子进程结束，如果在调用 wait() 时子进程已经结束，则会立即返回子进程结束状态值。结束状态信息由参数 wstatus 返回，函数返回值为子进程的 PID，如果不在意子进程的结束状态信息，参数可以为 NULL
+
+注意：
+
+- wait() 要与 fork() 配套出现，在 fork() 前调用 wait()，wait() 会返回 -1
+
+### waitpid()
+
+原型：`pid_t waitpid(pid_t pid, int *_Nullable wstatus, int options);`
+
+- 参数 pid
+    - pid < -1: 等待进程号为 pid 绝对值的任何子进程
+    - pid = -1: 等待任何子进程，等于 wait() 函数
+    - pid = 0: 等待进程组号与目前进程相同的任何子进程，即等待任何与调用 waitpid() 函数的进程在同一个进程组的进程
+    - pid > 0: 等待指定进程号为 pid 的子进程
+- 参数 wstatus: 同 wait() 函数
+- 参数 options
+    - WNOHANG: 如果子进程没有终止，立即返回 0，而不在此阻塞；如果子进程已终止，立即返回子进程的进程号和状态信息
+    - WUNTRACED: 如果子进程在暂停状态，则立即返回
+    - WCONTINUED: 子进程通过 SIGCONT 信号恢复运行，则立即返回
+    - 0: 不使用选项
+
+# 06. 信号
+
+信号是进程间通信机制中唯一的异步通信机制。在 Linux 中，信号可以被生成、捕获、响应和忽略，进程间可以互相发送信号，内核也可以因为内部事件而给进程发送信号，通知进程发生了某个事件。
+
+可以通过 `kill -l` 查看系统支持的信号：
+
+```shell
+dlans@DESKTOP-7O882NM:~
+$ kill -l
+ 1) SIGHUP       2) SIGINT       3) SIGQUIT      4) SIGILL       5) SIGTRAP
+ 6) SIGABRT      7) SIGBUS       8) SIGFPE       9) SIGKILL     10) SIGUSR1
+11) SIGSEGV     12) SIGUSR2     13) SIGPIPE     14) SIGALRM     15) SIGTERM
+16) SIGSTKFLT   17) SIGCHLD     18) SIGCONT     19) SIGSTOP     20) SIGTSTP
+21) SIGTTIN     22) SIGTTOU     23) SIGURG      24) SIGXCPU     25) SIGXFSZ
+26) SIGVTALRM   27) SIGPROF     28) SIGWINCH    29) SIGIO       30) SIGPWR
+31) SIGSYS      34) SIGRTMIN    35) SIGRTMIN+1  36) SIGRTMIN+2  37) SIGRTMIN+3
+38) SIGRTMIN+4  39) SIGRTMIN+5  40) SIGRTMIN+6  41) SIGRTMIN+7  42) SIGRTMIN+8
+43) SIGRTMIN+9  44) SIGRTMIN+10 45) SIGRTMIN+11 46) SIGRTMIN+12 47) SIGRTMIN+13
+48) SIGRTMIN+14 49) SIGRTMIN+15 50) SIGRTMAX-14 51) SIGRTMAX-13 52) SIGRTMAX-12
+53) SIGRTMAX-11 54) SIGRTMAX-10 55) SIGRTMAX-9  56) SIGRTMAX-8  57) SIGRTMAX-7
+58) SIGRTMAX-6  59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2
+63) SIGRTMAX-1  64) SIGRTMAX
+```
+
+信号可以分为两类，1-31 属于非实时信号，也称为不可靠信号，它们从 UNIX 中继承下来，34-64 为实时信号，也被称为可靠信号
+
+| 信号值 | 名称      | 描述                                                         |
+| ------ | --------- | ------------------------------------------------------------ |
+| 1      | SIGHUP    | 控制终端被关闭                                               |
+| 2      | SIGINT    | 程序终止，通常为键入 Ctrl+C                                  |
+| 3      | SIGQUIT   | 类似 SIGINT，但由 QUIT 字符来控制                            |
+| 4      | SIGILL    | CPU 检测到进程执行了非法指令产生，通常因为可执行文件本身出现错误 |
+| 5      | SIGTRAP   | 由断点指令或其它 trap 产生，由 debugger 使用                 |
+| 6      | SIGABRT   | 调用系统函数 abort() 产生                                    |
+| 7      | SIGBUS    | 总线错误，一般非法地址导致，包括内存对齐出错                 |
+| 8      | SIGFPE    | CPU 出现算术运算错误                                         |
+| 9      | SIGKILL   | 系统结束某进程产生，本信号不能被阻塞、处理、忽略             |
+| 10     | SIGUSR1   | 用户定义信号                                                 |
+| 11     | SIGSEGV   | 非法内存访问产生                                             |
+| 12     | SIGUSR2   | 用户定义信号                                                 |
+| 13     | SIGPIPE   | 在进程间通信产生                                             |
+| 14     | SIGALRM   | 定时器到期 alarm 函数使用该信号                              |
+| 15     | SIGTERM   | 程序结束，该信号可被阻塞和处理                               |
+| 16     | SIGSTKFLT | 已废弃                                                       |
+| 17     | SIGCHLD   | 子进程暂停或终止，父进程将收到此信号                         |
+| 18     | SIGCONT   | 进程恢复运行，该信号不能被阻塞                               |
+| 19     | SIGSTOP   | 进程暂停，不能被忽略、阻塞、捕捉                             |
+| 20     | SIGTSTP   | 由终端发起的暂停，可被处理或忽略                             |
+| 21     | SIGTTIN   | 后台进程发起输入请求时控制终端产生该信号                     |
+| 22     | SIGTTOU   | 后台进程发起输出请求时控制终端产生该信号                     |
+| 23     | SIGURG    | 套接字上出现紧急数据                                         |
+| 24     | SIGXCPU   | 处理器占用时间超出限制值                                     |
+| 25     | SIGXFSZ   | 文件大小超出限制值                                           |
+| 26     | SIGVTALRM | 由虚拟定时器产生的虚拟时钟信号                               |
+| 27     | SIGPROF   | 类似于 SIGALRM/SIGVTALRM，但包括该进程用的 CPU 时间即系统调用的时间 |
+| 28     | SIGWINCH  | 窗口大小改变                                                 |
+| 29     | SIGIO     | 文件描述符准备就绪，可以开始进行输入/输出                    |
+| 30     | SIGPWR    | 启动失败                                                     |
+| 31     | SIGSYS    | 非法系统调用                                                 |
+
+- 任何进程都可以使用 `kill()` 函数来产生任何信号
+- 信号的响应处理一般过程：如果信号被阻塞，则信号挂起，不做任何处理，等到接触对其阻塞为止。如果信号被捕获，则进一步判断捕获的类型，如果设置了响应函数，那么执行响应函数。如果设置为忽略，那么直接丢弃该信号。最后执行对信号的默认处理。
+- 系统对信号的处理：一般在中断返回或从内核态返回用户态时。这表示即使信号来了，进程也不一定会立即去处理，因为系统不会为了处理一个信号而将当前正在运行的进程挂起，这会导致资源消耗过大。
+
+实时信号与非实时信号：
+
+- 实时信号：可以排队，发了多少个信号，进程就会执行多少次相应的处理动作
+- 非实时信号：不可以排队，新信号会将旧信号挤掉，导致旧信号没有被进程处理
